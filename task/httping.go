@@ -21,6 +21,14 @@ var (
 	ColoRegexp        = regexp.MustCompile(`[A-Z]{3}`)
 )
 
+type devNull struct{}
+
+func (devNull) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+var Discard io.Writer = devNull{}
+
 // pingReceived pingTotalTime
 func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration, string) {
 	hc := http.Client{
@@ -60,7 +68,7 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration, string) {
 			}
 		}
 
-		io.Copy(io.Discard, response.Body)
+		io.Copy(Discard, response.Body)
 
 		// 通过头部 Server 值判断是 Cloudflare 还是 AWS CloudFront 并设置 cfRay 为各自的机场地区码完整内容
 		colo = getHeaderColo(response.Header)
@@ -94,7 +102,7 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration, string) {
 			continue
 		}
 		success++
-		io.Copy(io.Discard, response.Body)
+		io.Copy(Discard, response.Body)
 		_ = response.Body.Close()
 		duration := time.Since(startTime)
 		delay += duration
