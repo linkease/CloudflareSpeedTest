@@ -1,5 +1,7 @@
 module github.com/XIU2/CloudflareSpeedTest
 
-go 1.14
+go 1.18
 
-require github.com/VividCortex/ewma v1.1.1
+require github.com/VividCortex/ewma v1.2.0
+
+// Removed external github.com/fatih/color dependency; using local package color.
